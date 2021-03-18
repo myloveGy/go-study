@@ -27,7 +27,10 @@ func CopyFile(source, dest string) error {
 			}
 		}
 
-		destFile.Write(buffer[:n])
+		if _, err = destFile.Write(buffer[:n]); err != nil {
+			return err
+		}
+
 	}
 
 	return nil

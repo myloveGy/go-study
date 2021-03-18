@@ -15,12 +15,14 @@ func Write(filename, content string) error {
 
 	defer f.Close()
 
-	_, err = f.Write([]byte(content))
-	if err != nil {
+	if _, err = f.Write([]byte(content)); err != nil {
 		return err
 	}
 
-	f.Write([]byte{'\n'})
+	if _, err = f.Write([]byte{'\n'}); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -32,7 +34,7 @@ func WriteString(filename, content string) error {
 
 	defer f.Close()
 
-	_, err = io.WriteString(f, content + "\n")
+	_, err = io.WriteString(f, content+"\n")
 	return err
 }
 
