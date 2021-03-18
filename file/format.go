@@ -10,15 +10,10 @@ const (
 	MB    = "MB"
 	GB    = "GB"
 	TB    = "TB"
+	PB    = "PB"
 )
 
-var MapUnit = map[int]string{
-	0: Bytes,
-	1: KB,
-	2: MB,
-	3: GB,
-	4: TB,
-}
+var Unit = []string{Bytes, KB, MB, GB, TB, PB}
 
 type Format struct {
 	Size int64 // 文件大小
@@ -29,18 +24,12 @@ func NewFormat(size int64) *Format {
 }
 
 func (f *Format) Format() string {
-	i := 0;
-	size := float64(f.Size);
-	for  size > 1024 {
+	i := 0
+	size := float64(f.Size)
+	for size > 1024 && i < len(Unit) {
 		size = size / 1024
-		i ++
+		i++
 	}
 
-	s := fmt.Sprintf("%0.2f", size)
-	v, ok := MapUnit[i]
-	if ok {
-		return fmt.Sprintf("%s%s", s, v)
-	}
-
-	return fmt.Sprintf("%s", s)
+	return fmt.Sprintf("%0.2f%s", size, Unit[i])
 }
