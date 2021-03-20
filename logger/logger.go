@@ -2,6 +2,7 @@ package logger
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"runtime"
 	"strings"
@@ -39,7 +40,7 @@ const (
 	LOG_LEVEL_FATAL
 
 	// 默认输出格式
-	DefaultTemplate = "[{time}] {level}: {message} {content}"
+	DefaultTemplate = "[{time}] [{func}:{file}:{line}] {level}: {message} {content}"
 
 	// 默认的时间格式
 	DefaultFormat = "2006-01-02 15:04:05"
@@ -96,6 +97,12 @@ func (l *Logger) SetJson(json bool) {
 	l.json = json
 }
 
+func (l *Logger) SetTemplate(template string) {
+	l.mutex.Lock()
+	defer l.mutex.Unlock()
+	l.template = template
+}
+
 func (l *Logger) Debug(message string, content interface{}) {
 	l.log(Debug, message, content)
 }
@@ -134,9 +141,8 @@ func (l *Logger) log(level, message string, content interface{}) {
 	nowTime := time.Now().Format(l.format)
 
 	var writeString string
+	funcName, fileName, line := getCaller(3)
 	if l.json {
-		funcName, fileName, line := getCaller(3)
-
 		jsonData, _ := json.Marshal(&logContent{
 			Time:     nowTime,
 			FuncName: funcName,
@@ -152,6 +158,9 @@ func (l *Logger) log(level, message string, content interface{}) {
 		jsonData, _ := json.Marshal(content)
 		// 替换时间、等级、消息、内容
 		writeString = strings.Replace(l.template, "{time}", nowTime, -1)
+		writeString = strings.Replace(writeString, "{file}", fileName, -1)
+		writeString = strings.Replace(writeString, "{func}", funcName, -1)
+		writeString = strings.Replace(writeString, "{line}", fmt.Sprintf("%d", line), -1)
 		writeString = strings.Replace(writeString, "{level}", level, -1)
 		writeString = strings.Replace(writeString, "{message}", message, -1)
 		writeString = strings.Replace(writeString, "{content}", string(jsonData), -1)

@@ -35,6 +35,7 @@ func TestInfo(t *testing.T) {
 	defer file.Close()
 
 	logger2 := NewLogger(file, "")
+	logger2.SetTemplate("[{time}] {level}: {message} {content}")
 	logger2.Notice("测试Notcie", nil)
 	logger2.Warning("测试Warning", "就是测试的数据")
 	logger2.Info("测试Info", 123232323)
