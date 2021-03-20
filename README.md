@@ -13,7 +13,3 @@ go mod tidy
 ```shell
 go test -timeout 60s study/file -run ^TestReadFileByIo$ -v
 ```
-或者
-```shell
-go test study/file -test.run -v TestFormat
-```
