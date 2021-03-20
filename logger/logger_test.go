@@ -20,6 +20,7 @@ func TestNewLogger(t *testing.T) {
 func TestInfo(t *testing.T) {
 	logger := NewLogger(os.Stdout, "info")
 	logger.SetJson(true)
+	logger.SetFormat("2006/01/02 15:04:05")
 	logger.Debug("我的debug", "测试内容")
 	logger.Info("我的测试", nil)
 	logger.Trace("我的测试", map[string]interface{}{

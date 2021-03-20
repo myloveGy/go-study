@@ -103,6 +103,12 @@ func (l *Logger) SetTemplate(template string) {
 	l.template = template
 }
 
+func (l *Logger) SetFormat(format string) {
+	l.mutex.Lock()
+	defer l.mutex.Unlock()
+	l.format = format
+}
+
 func (l *Logger) Debug(message string, content interface{}) {
 	l.log(Debug, message, content)
 }
