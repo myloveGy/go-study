@@ -7,6 +7,7 @@ import (
 	"io"
 	"os"
 	"reflect"
+	"regexp"
 	"strconv"
 	"strings"
 	"sync"
@@ -34,6 +35,8 @@ func Load(filename string) (*IniConfig, error) {
 	groupName := ""
 	line := 0
 
+	// 需要替换
+	replaceSlice := make([]string, 0)
 	for {
 		line += 1
 		lineString, err := reader.ReadString('\n')
@@ -56,14 +59,18 @@ func Load(filename string) (*IniConfig, error) {
 			}
 		} else if strings.Contains(lineString, "=") {
 			keyNames := strings.Split(lineString, "=")
-			if len(keyNames) != 2 || strings.TrimSpace(keyNames[0]) == "" {
+			if len(keyNames) < 2 || strings.TrimSpace(keyNames[0]) == "" {
 				return nil, fmt.Errorf("config value read error line: %d", line)
 			}
 
 			name := strings.TrimSpace(keyNames[0])
-			value := strings.TrimSpace(keyNames[1])
+			value := strings.TrimSpace(strings.Join(keyNames[1:], ""))
 			if groupName != "" {
 				name = fmt.Sprintf("%s.%s", groupName, name)
+			}
+
+			if strings.Contains(value, "${") && strings.Contains(value, "}") {
+				replaceSlice = append(replaceSlice, name)
 			}
 
 			if err := config.Set(name, value); err != nil {
@@ -78,6 +85,24 @@ func Load(filename string) (*IniConfig, error) {
 
 			// 存在错误退出
 			return nil, err
+		}
+	}
+
+	// 支持${mysql.host}方式设置值
+	reg := regexp.MustCompile(`\$\{(\w{0,}\.{0,}\w{0,})\}`)
+	for _, name := range replaceSlice {
+		if value, has := config.Get(name, ""); has {
+			replaceList := reg.FindAllString(value, -1)
+			for _, v := range replaceList {
+				getName := v[2 : len(v)-1]
+				if tempValue, exist := config.Get(getName, ""); exist {
+					value = strings.ReplaceAll(value, v, tempValue)
+				}
+			}
+
+			if err := config.Set(name, value); err != nil {
+				return nil, err
+			}
 		}
 	}
 

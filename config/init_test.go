@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"regexp"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -10,7 +11,7 @@ import (
 func TestLoad(t *testing.T) {
 	config, err := Load("./config.ini")
 	assert.NoError(t, err)
-	fmt.Println(config)
+	assert.Equal(t, "jinxing.liu", config.data["app_name"])
 }
 
 func TestParse(t *testing.T) {
@@ -35,6 +36,7 @@ func TestParse(t *testing.T) {
 
 	// 内部引用组合
 	assert.Equal(t, "root", appConfig.MySqlConfig.Username)
+	assert.Equal(t, "root:123456@tcp(127.0.0.1:3306)/project?charsetutf8&parseTimeTrue&locAsia%2FShanghai", appConfig.MySqlConfig.Dsn)
 	assert.Equal(t, 6379, appConfig.RedisConfig.Port)
 }
 
@@ -146,4 +148,8 @@ func TestSet(t *testing.T) {
 	assert.Error(t, config.Set("name.user", "456"))
 	assert.Error(t, config.Set("", "789"))
 	assert.Error(t, config.Set("haha.username", "789"))
+}
+
+func TestRegexp(t *testing.T) {
+	fmt.Println(regexp.MustCompile(`\$\{(\w{0,}\.{0,}\w{0,})\}`).FindAllString("${username}12121212${host}", -1))
 }

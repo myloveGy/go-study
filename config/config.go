@@ -3,8 +3,10 @@ package config
 type MySqlConfig struct {
 	Host     string `ini:"host"`
 	Port     int    `ini:"port"`
+	DbName   string `ini:"db"`
 	Username string `ini:"username"`
 	Password string `ini:"password"`
+	Dsn      string `ini:"dsn"`
 }
 
 type RedisConfig struct {
