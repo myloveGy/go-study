@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"runtime"
 	"strings"
 	"sync"
@@ -68,21 +69,29 @@ func parseLogLevel(level string) LogLevel {
 }
 
 type Logger struct {
-	write    io.Writer  // 写类型
-	format   string     // 日志时间格式
-	template string     // 日志输出格式
-	level    LogLevel   // 日志级别
-	json     bool       // 是否json格式记录日志
-	mutex    sync.Mutex // 锁
+	write    io.Writer   // 写类型
+	format   string      // 日志时间格式
+	template string      // 日志输出格式
+	level    LogLevel    // 日志级别
+	json     bool        // 是否json格式记录日志
+	mutex    sync.Mutex  // 锁
+	channel  chan string // 写的日志
+	wait     chan bool   // 等待
 }
 
-func NewLogger(write io.Writer, level string) *Logger {
-	return &Logger{
+func NewLogger(write io.Writer, level string, cap int) *Logger {
+	logger := &Logger{
 		write:    write,
 		format:   DefaultFormat,
 		template: DefaultTemplate,
 		level:    parseLogLevel(level),
+		channel:  make(chan string, cap),
+		wait:     make(chan bool),
 	}
+
+	go logger.background()
+
+	return logger
 }
 
 func (l *Logger) SetLogLevel(info string) {
@@ -172,7 +181,38 @@ func (l *Logger) log(level, message string, content interface{}) {
 		writeString = strings.Replace(writeString, "{content}", string(jsonData), -1)
 	}
 
-	_, _ = l.write.Write([]byte(writeString + "\n"))
+	// 写select是为了防止等待, 最多等待3秒，然后丢掉日志
+	select {
+	case l.channel <- writeString + "\n":
+	case <-time.After(3 * time.Second):
+	}
+}
+
+func (l *Logger) background() {
+	num := 0
+	for {
+		select {
+		case line, ok := <-l.channel:
+			if ok {
+				if _, err := l.write.Write([]byte(line)); err != nil {
+					log.Println("logger write error: ", err.Error())
+				}
+			}
+		case <-time.After(500 * time.Microsecond):
+			log.Println("logger wait")
+			num += 1
+		}
+
+		if num >= 3 {
+			break
+		}
+	}
+
+	l.wait <- true
+}
+
+func (l *Logger) Wait() bool {
+	return <-l.wait
 }
 
 func getCaller(skip int) (string, string, int) {

@@ -10,15 +10,13 @@ import (
 )
 
 func TestNewLogger(t *testing.T) {
-	assert.Equal(t, &Logger{
-		write:    os.Stdout,
-		format:   DefaultFormat,
-		template: DefaultTemplate,
-		level:    LOG_LEVEL_DEBUG}, NewLogger(os.Stdout, ""))
+	logger := NewLogger(os.Stdout, "", 100)
+	assert.Equal(t, os.Stdout, logger.write)
+	assert.Equal(t, DefaultTemplate, logger.template)
 }
 
 func TestInfo(t *testing.T) {
-	logger := NewLogger(os.Stdout, "info")
+	logger := NewLogger(os.Stdout, "info", 100)
 	logger.SetJson(true)
 	logger.SetFormat("2006/01/02 15:04:05")
 	logger.Debug("我的debug", "测试内容")
@@ -30,12 +28,13 @@ func TestInfo(t *testing.T) {
 	logger.Warning("我的warning", "测试内容呢")
 	logger.Error("出现错误了", ":)")
 	logger.Fatal("什么信息", 123)
+	fmt.Println("等待执行完成", logger.Wait())
 
 	file, err := os.OpenFile(fmt.Sprintf("./%s.log", time.Now().Format("20060102")), os.O_CREATE|os.O_APPEND|os.O_WRONLY, os.ModePerm)
 	assert.NoError(t, err)
 	defer file.Close()
 
-	logger2 := NewLogger(file, "")
+	logger2 := NewLogger(file, "", 100)
 	logger2.SetTemplate("[{time}] {level}: {message} {content}")
 	logger2.Notice("测试Notcie", nil)
 	logger2.Warning("测试Warning", "就是测试的数据")
@@ -43,6 +42,7 @@ func TestInfo(t *testing.T) {
 	logger2.Debug("测试Debug", "不知道")
 	logger2.Error("测试Error", "不知道")
 	logger2.Fatal("测试Fatal", "不知道")
+	fmt.Println("等待执行完成", logger2.Wait())
 }
 
 func Test_getCaller(t *testing.T) {

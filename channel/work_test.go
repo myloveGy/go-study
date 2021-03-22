@@ -73,3 +73,49 @@ func TestWorker(t *testing.T) {
 	// 	fmt.Println("num = ", i)
 	// }
 }
+
+func TestSelect(t *testing.T) {
+
+	channel1 := make(chan int, 2)
+	channel2 := make(chan int, 2)
+
+	go func() {
+		defer close(channel1)
+		for i := 0; i < 5; i++ {
+			time.Sleep(time.Second)
+			channel1 <- i * 2
+		}
+	}()
+
+	go func() {
+		defer close(channel2)
+		for i := 0; i < 5; i++ {
+			time.Sleep(time.Second)
+			channel2 <- i
+		}
+	}()
+
+	channel1Ok := true
+	channel2Ok := true
+
+	for {
+		select {
+		case i, ok := <-channel1:
+			channel1Ok = ok
+			if ok {
+				fmt.Printf("channel1 i := %d ok: %v\n", i, ok)
+			}
+		case num, ok := <-channel2:
+			channel2Ok = ok
+			if ok {
+				fmt.Printf("channel2 num = %d ok: %v\n", num, ok)
+			}
+		}
+
+		if !channel1Ok && !channel2Ok {
+			break
+		}
+	}
+
+	fmt.Println("执行完了")
+}
