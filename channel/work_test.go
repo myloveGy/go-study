@@ -24,7 +24,7 @@ func TestChanel(t *testing.T) {
 }
 
 func TestChanelWaitGroup(t *testing.T) {
-	
+
 	var group sync.WaitGroup
 
 	for i := 0; i < 10; i++ {
@@ -48,4 +48,28 @@ func TestDigitsSum(t *testing.T) {
 	assert.Equal(t, int64(3), DigitsSum(12))
 	assert.Equal(t, int64(6), DigitsSum(123))
 	assert.Equal(t, int64(10), DigitsSum(19))
+}
+
+func TestWorker(t *testing.T) {
+	job := make(chan int, 100)
+	results := make(chan int, 100)
+
+	// 开启3个goroutine
+	for i := 0; i < 3; i++ {
+		go worker(i, job, results)
+	}
+
+	// 开启5个任务
+	for i := 0; i < 5; i++ {
+		job <- i
+	}
+	close(job)
+
+	// for i := 0; i < 5; i++ {
+	// 	num := <-results
+	// 	fmt.Println("num = ", num)
+	// }
+	for i := range results {
+		fmt.Println("num = ", i)
+	}
 }
