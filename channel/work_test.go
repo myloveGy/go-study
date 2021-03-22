@@ -65,11 +65,11 @@ func TestWorker(t *testing.T) {
 	}
 	close(job)
 
-	// for i := 0; i < 5; i++ {
-	// 	num := <-results
-	// 	fmt.Println("num = ", num)
-	// }
-	for i := range results {
-		fmt.Println("num = ", i)
+	for i := 0; i < 5; i++ {
+		num := <-results
+		fmt.Println("num = ", num)
 	}
+	// for i := range results {
+	// 	fmt.Println("num = ", i)
+	// }
 }
