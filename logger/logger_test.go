@@ -28,7 +28,7 @@ func TestInfo(t *testing.T) {
 	logger.Warning("我的warning", "测试内容呢")
 	logger.Error("出现错误了", ":)")
 	logger.Fatal("什么信息", 123)
-	fmt.Println("等待执行完成", logger.Wait())
+	fmt.Println("等待执行完成", logger.Close(), logger.Wait())
 
 	file, err := os.OpenFile(fmt.Sprintf("./%s.log", time.Now().Format("20060102")), os.O_CREATE|os.O_APPEND|os.O_WRONLY, os.ModePerm)
 	assert.NoError(t, err)
@@ -42,7 +42,7 @@ func TestInfo(t *testing.T) {
 	logger2.Debug("测试Debug", "不知道")
 	logger2.Error("测试Error", "不知道")
 	logger2.Fatal("测试Fatal", "不知道")
-	fmt.Println("等待执行完成", logger2.Wait())
+	fmt.Println("等待执行完成", logger2.Close(), logger2.Wait())
 }
 
 func Test_getCaller(t *testing.T) {

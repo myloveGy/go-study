@@ -75,8 +75,9 @@ type Logger struct {
 	level    LogLevel    // 日志级别
 	json     bool        // 是否json格式记录日志
 	mutex    sync.Mutex  // 锁
-	channel  chan string // 写的日志
+	channel  chan string // 写日志的通道
 	wait     chan bool   // 等待
+	close    bool        // 关闭
 }
 
 func NewLogger(write io.Writer, level string, cap int) *Logger {
@@ -185,30 +186,38 @@ func (l *Logger) log(level, message string, content interface{}) {
 	select {
 	case l.channel <- writeString + "\n":
 	case <-time.After(3 * time.Second):
+		log.Println("write channel after 3s")
 	}
 }
 
 func (l *Logger) background() {
-	num := 0
-	for {
-		select {
-		case line, ok := <-l.channel:
-			if ok {
-				if _, err := l.write.Write([]byte(line)); err != nil {
-					log.Println("logger write error: ", err.Error())
-				}
-			}
-		case <-time.After(500 * time.Microsecond):
-			log.Println("logger wait")
-			num += 1
-		}
 
-		if num >= 3 {
-			break
+	// 一直处理读取通道中的日志内容，直到关闭
+	for line := range l.channel {
+		if _, err := l.write.Write([]byte(line)); err != nil {
+			log.Println("logger write error: ", err.Error())
 		}
 	}
 
-	l.wait <- true
+	// 启动一个协程去通知外面是否已经处理完成
+	go func() {
+		l.wait <- true
+	}()
+}
+
+func (l *Logger) Close() bool {
+	l.mutex.Lock()
+	defer l.mutex.Unlock()
+
+	// 已经关闭，直接返回
+	if l.close {
+		return true
+	}
+
+	l.close = true
+	close(l.channel)
+
+	return true
 }
 
 func (l *Logger) Wait() bool {
