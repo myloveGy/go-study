@@ -2,16 +2,18 @@ package main
 
 import (
 	"fmt"
-	"study/commands"
+	"study/socket"
 )
 
 func main() {
+
 	fmt.Println("Hello Word! Golang")
-	var a string
-	fmt.Scanln(&a)
-	fmt.Println("您输入的为:", a)
 
 	// 读取输入内容
-	commands.UseSanc()
-	commands.UseBufio()
+	// commands.UseSanc()
+	// commands.UseBufio()
+
+	// TCP监听
+	err := socket.ListenTCP("127.0.0.1:9099")
+	fmt.Println("error:", err)
 }
