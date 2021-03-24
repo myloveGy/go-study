@@ -36,7 +36,7 @@ func ClientTCP(address string) error {
 		}
 
 		fmt.Println("读到输入数据:", input)
-  
+
 		// 写入数据
 		if _, err := connection.Write([]byte(input)); err != nil {
 			fmt.Printf("写入数据失败: %v\n", err)
