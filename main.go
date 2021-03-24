@@ -4,15 +4,19 @@ import (
 	"flag"
 	"fmt"
 	"study/commands"
-	"study/socket"
+	"study/socket/tcp"
+	"study/socket/udp"
 )
 
 const (
 	Command    = "command"        // 命令行
-	TcpService = "tcp-service"    // tcp服务
+	TcpServer  = "tcp-server"     // tcp服务
 	TcpClient  = "tcp-client"     // tcp连接
 	TcpSticky  = "tcp-sticky"     // tcp 黏包测试
 	TcpAddress = "127.0.0.1:9099" // tcp 连接地址
+	UdpAddress = "127.0.0.1:9098" // udp 连接地址
+	UdpServer  = "udp-server"     // upd 服务
+	UdpClient  = "udp-client"     // upd 连接
 )
 
 func main() {
@@ -36,15 +40,21 @@ func main() {
 		// 读取输入内容
 		commands.UseSanc()
 		commands.UseBufio()
-	case TcpService:
+	case TcpServer:
 		// TCP监听
-		err := socket.ListenTCP(TcpAddress, args)
-		fmt.Println("error:", err)
+		err := tcp.ListenTCP(TcpAddress, args)
+		fmt.Println("Tcp Server error:", err)
 	case TcpClient:
-		err := socket.ClientTCP(TcpAddress)
-		fmt.Println("client tcp error:", err)
+		err := tcp.ClientTCP(TcpAddress)
+		fmt.Println("Tcp Client error:", err)
 	case TcpSticky:
-		err := socket.StickyTCP(TcpAddress, args)
-		fmt.Println("client sticky tcp error:", err)
+		err := tcp.StickyTCP(TcpAddress, args)
+		fmt.Println("Tcp Client Sticky error:", err)
+	case UdpServer:
+		err := udp.Listen(UdpAddress)
+		fmt.Println("Udp Server error:", err)
+	case UdpClient:
+		err := udp.Client(UdpAddress)
+		fmt.Println("Udp Client error:", err)
 	}
 }

@@ -1,8 +1,9 @@
-package socket
+package tcp
 
 import (
 	"fmt"
 	"net"
+	"study/socket"
 )
 
 func StickyTCP(address, writeType string) error {
@@ -18,7 +19,7 @@ func StickyTCP(address, writeType string) error {
 		message := fmt.Sprintf(`hello world! i = %d`, i)
 
 		if writeType == "sticky" {
-			data, err := Encode(message)
+			data, err := socket.Encode(message)
 			if err != nil {
 				fmt.Println("encode message error:", err)
 			}

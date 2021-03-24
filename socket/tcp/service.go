@@ -1,9 +1,10 @@
-package socket
+package tcp
 
 import (
 	"bufio"
 	"fmt"
 	"net"
+	"study/socket"
 )
 
 func process(connection net.Conn, readType string) {
@@ -20,7 +21,7 @@ func process(connection net.Conn, readType string) {
 
 		// 读取方式
 		if readType == "sticky" {
-			line, err = Decode(reader)
+			line, err = socket.Decode(reader)
 		} else {
 			line, err = simpleRead(reader)
 		}
