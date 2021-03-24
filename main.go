@@ -26,7 +26,7 @@ func main() {
 	flag.StringVar(&args, "args", "", "请输入执行命令的参数")
 	flag.Parse()
 	flag.Usage = func() {
-		fmt.Println("请输入需要执行的命令 -name=")
+		fmt.Println("请输入需要执行的命令 -name=[xxx] -args=[xxx]")
 		flag.PrintDefaults()
 	}
 
