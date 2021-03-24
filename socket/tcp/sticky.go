@@ -6,7 +6,7 @@ import (
 	"study/socket"
 )
 
-func StickyTCP(address, writeType string) error {
+func Sticky(address, writeType string) error {
 	conn, err := net.Dial("tcp", address)
 	if err != nil {
 		return err

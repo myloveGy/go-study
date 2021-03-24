@@ -52,7 +52,7 @@ func simpleRead(reader *bufio.Reader) (string, error) {
 	return string(buf[:n]), nil
 }
 
-func ListenTCP(address, readerType string) error {
+func Listen(address, readerType string) error {
 	// 监听连接
 	lister, err := net.Listen("tcp", address)
 	if err != nil {

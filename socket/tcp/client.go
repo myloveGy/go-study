@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-func ClientTCP(address string) error {
+func Client(address string) error {
 
 	// 建立连接
 	connection, err := net.Dial("tcp", address)

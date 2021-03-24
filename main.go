@@ -42,13 +42,13 @@ func main() {
 		commands.UseBufio()
 	case TcpServer:
 		// TCP监听
-		err := tcp.ListenTCP(TcpAddress, args)
+		err := tcp.Listen(TcpAddress, args)
 		fmt.Println("Tcp Server error:", err)
 	case TcpClient:
-		err := tcp.ClientTCP(TcpAddress)
+		err := tcp.Client(TcpAddress)
 		fmt.Println("Tcp Client error:", err)
 	case TcpSticky:
-		err := tcp.StickyTCP(TcpAddress, args)
+		err := tcp.Sticky(TcpAddress, args)
 		fmt.Println("Tcp Client Sticky error:", err)
 	case UdpServer:
 		err := udp.Listen(UdpAddress)
