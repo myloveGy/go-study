@@ -43,6 +43,7 @@ func Open() error {
 			LastLoginIp string
 		)
 
+		// 解析数据
 		if err := rows.Scan(&UserId, &Username, &Email, &Status, &LastLoginIp); err != nil {
 			return err
 		}
