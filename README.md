@@ -13,3 +13,12 @@ go mod tidy
 ```shell
 go test -timeout 60s study/file -run ^TestReadFileByIo$ -v
 ```
+
+测试覆盖率
+```shell
+go test -v -short -covermode=count -coverprofile=cover.out 
+```
+
+```shell
+go tool cover -html=cover.out -o cover.html 
+````
