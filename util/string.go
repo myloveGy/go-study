@@ -67,3 +67,22 @@ func Split2(str, sep string) []string {
 
 	return result
 }
+
+func Snake(name string) string {
+	array := []byte(name)
+	bytes := make([]byte, 0)
+	for k, v := range array {
+		// 大写字母
+		if 65 <= v && v <= 90 {
+			if k != 0 {
+				bytes = append(bytes, '_')
+			}
+
+			bytes = append(bytes, v+32)
+		} else {
+			bytes = append(bytes, v)
+		}
+	}
+
+	return string(bytes)
+}

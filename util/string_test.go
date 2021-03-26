@@ -18,3 +18,9 @@ func TestSplit2(t *testing.T) {
 	assert.Equal(t, []string{"jinxing", "liu"}, Split2("jinxing.liu", "."))
 	assert.Equal(t, []string{"jinxing.liu"}, Split2("jinxing.liu", "abc"))
 }
+
+func TestSnake(t *testing.T) {
+	assert.Equal(t, "user_id", Snake("UserId"))
+	assert.Equal(t, "user_id", Snake("userId"))
+	assert.Equal(t, "user_id", Snake("user_id"))
+}
