@@ -12,7 +12,7 @@ import (
 func Open() (*sql.DB, error) {
 
 	// 效验dsn
-	db, err := sql.Open("mysql", "root:123456@tcp(127.0.0.1:3306)/my_project?charset=utf8&parseTime=true")
+	db, err := sql.Open("mysql", "root:@tcp(127.0.0.1:3306)/project?charset=utf8&parseTime=true")
 	if err != nil {
 		fmt.Println("MySQL DSN Error:", err)
 		return nil, err

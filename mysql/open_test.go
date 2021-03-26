@@ -30,6 +30,7 @@ func TestQuery(t *testing.T) {
 
 	list := make([]*Admin, 0)
 
+	// 通过反射获取slice元素类型
 	model := reflect.New(reflect.ValueOf(list).Type().Elem()).Elem().Interface()
 	if v, ok := model.(IModel); ok {
 		fmt.Println(v.TableName(), v.PK())
